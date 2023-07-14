@@ -1,0 +1,77 @@
+{% load static %}
+{% include "navbar.html" %}
+
+
+    <style>
+      .login-form{
+        padding: 20px;
+        border : 2px solid cadetblue;
+        margin : 10px;
+        margin-top: 50px;
+        border-radius: 10px;
+        box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+        text-align: center;
+      }
+      .login-form h2{
+        text-align: center;
+        font-size: 25px;
+        text-transform:uppercase;
+        color:cadetblue;
+        font-weight: 500;
+      }
+
+      .login-form input{
+        margin-bottom: 20px;
+        border: 2px solid cadetblue;
+        box-shadow: rgba(0, 0, 0, 0.07) 0px 1px 2px, rgba(0, 0, 0, 0.07) 0px 2px 4px, rgba(0, 0, 0, 0.07) 0px 4px 8px, rgba(0, 0, 0, 0.07) 0px 8px 16px, rgba(0, 0, 0, 0.07) 0px 16px 32px, rgba(0, 0, 0, 0.07) 0px 32px 64px;
+      }
+
+      .login-form .but{
+        text-align: center;
+        background-color: cadetblue;
+        color : white;
+        border: 2px solid cadetblue;
+      }
+      .login-form a{
+        text-decoration: none;
+        color: rgba(78, 47, 101, 0.498);
+        font-weight: bold;
+
+      }
+      nav{
+        background-color: cadetblue;
+        color: white;
+        box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
+
+      }
+      nav a{
+        color: white;
+      }
+    </style>
+
+<br>
+ <section>
+      <div class="row">
+        <div class="col-sm-12 col-md-4 col-lg-4"></div>
+        <div class="col-sm-12 col-md-4 col-lg-4">
+          <form class="login-form" method="post">
+              {% for message in messages %}
+            <p class="text-center alert alert-danger">{{message}}</p>
+            {% endfor %}
+              {% csrf_token %}
+            <h2>Login</h2>
+            <img class="image" src="{% static 'logo/logo.jpg' %}" width="150px">
+            <input type="text" name="username" placeholder="User Name" class="form-control" required>
+            <input type="password" name="password" placeholder="password" class="form-control" required>
+            <input type="submit" class="btn but" value="Login">
+            <br>
+            <a  href="{% url 'signup' %}">Don't have an account?</a>
+          </form>
+
+        </div>
+
+      </div>
+    </section>
+
+
+{% include "footer.html" %}

@@ -1,0 +1,105 @@
+
+{% load static  %}
+{% include "sidenav.html" %}
+<main>
+    <!-- nav start -->
+  {% include "navbar.html" %}
+    <!-- nav end -->
+<style>
+
+    input,select,button{
+
+        box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
+        border : 1px solid green;
+
+    }
+
+
+</style>
+
+    <!-- content start-->
+
+    <div class="container p-5">
+        <br><br><br>
+        <div>
+            <img src="{% static 'logo/nobglogo.png' %}" width="500px" style="position:absolute; opacity:20%; left: 25%; top: 10%;">
+        </div>
+
+        <h1>OPD Form</h1>
+        <br>
+        <form method="post">
+            {% csrf_token %}
+
+
+            <div class="row">
+                <div class="col-md-6 col-sm-6 col-lg-6">
+                    <div class="mb-3">
+                        <input type="text" name="p_name" placeholder="Patient Name" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="text" name="mobile_number" placeholder="Mobile Number"  class="form-control" required>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6 col-sm-6 col-lg-6">
+
+                    <div class="mb-3">
+                        <input type="number" name="p_age" placeholder="Patient Age" class="form-control" required>
+                    </div>
+
+                    <select class="form-control" name="sex">
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="mb-3 col-md-12 col-sm-12 col-lg-12">
+                    <input type="text" name="p_address" placeholder="Patient Address" class="form-control" required>
+                </div>
+
+                <div class="col-md-6 col-sm-6 col-lg-6">
+                    <label for="doctor">Doctor</label>
+                    <select id="doctor"  name="doctor" class="form-select">
+                        {% for doctor in doctors %}
+                        <option value="{{doctor.id}}">Dr. {{doctor.first_name}} {{doctor.last_name}} ({{doctor.qualifications}})</option>
+                        {% endfor %}
+                    </select>
+
+
+                </div>
+
+                <div class="mt-5 mb-3 col-md-12 col-sm-12 col-lg-12">
+
+                    <div style=" text-align:center;z-index:99;">
+                        <input type="submit" class="btn btn-primary" value="Generate OPD bill" >
+                    </div>
+
+                </div>
+
+
+
+
+            </div>
+
+
+                <br>
+
+
+
+
+        </form>
+    </div>
+
+    <!-- content end-->
+
+    <br><br><br><br>
+
+    {% include "footer.html" %}
+  </main>
+
+</body>
+
+</html>

@@ -6,13 +6,46 @@
 
   <br><br><br>
 
-  <h1>All Doctors</h1>
-    <!-- content end-->
+  <h1 class="ml-5 mr-5">Doctors</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-12 col-sm-12 col-md-12 col-lg-3"></div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6" style="display:flex; border:3px solid green; border-radius:25px; margin:10px; ">
+        <input type="text" name="search" class="form-control" placeholder="Search" style="background-color:white; border:none;">
+        <input type="submit" value="🔍" style="background-color:white; border:none;">
+      </div>
+
+    </div>
+
+  </form>
+
+
+    <hr>
+
+  <section>
+            <div class="row ml-5 mr-5" id="allusers">
+              {% for doctor in doctors %}
+              <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+                <div class="user">
+                  <img class="image" src="https://cdn-icons-png.flaticon.com/512/5087/5087579.png" width="100px">
+                  <a id="att" href="#" style="text-transform: capitalize;">
+                    <h2 id="lname">{{doctor.first_name}} {{doctor.last_name}}</h2>
+                    <p>{{doctor.specialization}}</p>
+                    <p>{{doctor.contact_number}}</p>
+                    <p>{{doctor.qualifications}}</p>
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
 
 
 
+            </div>
 
-  
+    </section>
+
     <br><br><br><br>
 
 

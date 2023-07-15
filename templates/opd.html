@@ -25,20 +25,32 @@
             <img src="{% static 'logo/nobglogo.png' %}" width="500px" style="position:absolute; opacity:20%; left: 25%; top: 10%;">
         </div>
 
-        <h1>OPD Form</h1>
+        <h1>OPD/Emergency</h1>
         <br>
         <form method="post">
             {% csrf_token %}
 
 
+
+
             <div class="row">
+                <div class="col-md-6 col-sm-6 col-lg-6 mb-4">
+
+                </div>
+                <div class="col-md-6 col-sm-6 col-lg-6 mb-4">
+                    <select name="oe" class="form-control" style="background-color:rgba(0,0,225,0.5); color :white; ">
+                        <option value="OPD">OPD</option>
+                        <option value="Emergency">Emergency</option>
+                    </select>
+                </div>
+
                 <div class="col-md-6 col-sm-6 col-lg-6">
                     <div class="mb-3">
                         <input type="text" name="p_name" placeholder="Patient Name" class="form-control" required>
                     </div>
 
                     <div class="mb-3">
-                        <input type="text" name="mobile_number" placeholder="Mobile Number"  class="form-control" required>
+                        <input type="text" name="mobile_number" maxlength="10" placeholder="Mobile Number"  class="form-control" required>
                     </div>
                 </div>
 
@@ -49,7 +61,7 @@
                         <input type="number" name="p_age" placeholder="Patient Age" class="form-control" required>
                     </div>
 
-                    <select class="form-control" name="sex">
+                    <select class="form-control mb-3" name="sex">
                       <option value="male">Male</option>
                       <option value="female">Female</option>
                       <option value="other">Other</option>
@@ -61,7 +73,7 @@
                 </div>
 
                 <div class="col-md-6 col-sm-6 col-lg-6">
-                    <label for="doctor">Doctor</label>
+                    <label for="doctor">Doctor : </label>
                     <select id="doctor"  name="doctor" class="form-select">
                         {% for doctor in doctors %}
                         <option value="{{doctor.id}}">Dr. {{doctor.first_name}} {{doctor.last_name}} ({{doctor.qualifications}})</option>

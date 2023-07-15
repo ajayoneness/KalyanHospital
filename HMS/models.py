@@ -25,6 +25,7 @@ class Doctor(models.Model):
 
 class patient_table(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    oe = models.CharField(max_length=20, null=True, blank=True)
     p_name = models.CharField(max_length=50, null=True, blank=True)
     p_age = models.IntegerField(null=True, blank=True)
     mobile_number = models.CharField(max_length=20)

@@ -1,0 +1,136 @@
+
+{% include "sidenav.html" %}
+<main>
+    <!-- nav start -->
+  {% include "navbar.html" %}
+
+  <style>
+    body{
+      overflow-x : hidden;
+    }
+
+    #addbtn:hover{
+      background-color : gray;
+      color : white;
+    }
+
+
+    #suggestions-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .suggestion-item {
+      padding: 10px;
+      cursor: pointer;
+    }
+    
+    .suggestion-item:hover {
+      background-color: lightgray;
+    }
+
+    input{
+      box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
+
+
+    }
+       #search-input{
+      box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
+    }
+
+
+  </style>
+
+  <br><br><br><br>
+<h1 style="text-align:center">Generate Lab Report</h1>
+
+    <!-- content end-->
+  <form method="post">
+    {% csrf_token %}
+    <div class="row">
+
+      <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+
+      </div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6" style="display:flex; border:3px solid green; border-radius:25px; margin:0px; ">
+        <input type="text" name="search" class="form-control" placeholder="Enter Lab ID" style="background-color:white; border:none;" required>
+        <input type="submit" value="🔍" style="background-color:white; border:none;">
+      </div>
+
+    </div>
+
+    <br>
+  </form>
+
+
+
+  {% if patient %}
+  <section>
+    <div class="row" style="margin : 10px ; padding :10px; background-color : gray; color:white; border:none; border-radius:8px;box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;">
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+        <b>Patient ID : </b>{{patient.id}}<br>
+        <b>Name : </b>{{patient.p_name}}<br>
+        <b>Age|Sex : </b>{{patient.p_age}} | {{patient.sex}}<br>
+      </div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+        <b>Admit Date : </b>{{patient.admission_date.date}}<br>
+        <b>Referred By : </b>Dr. {{patient.doctor.first_name}} {{patient.doctor.last_name}}<br>
+      </div>
+    </div>
+  </section>
+  {% else %}
+  <section>
+    <div style="text-align:center; margin-top : 20px;">
+      <b class="" >{{message}}</b>
+    </div>
+  </section>
+
+  {% endif %}
+  <br>
+
+  <section>
+
+    <table style="text-align:center; margin-left:130px;">
+      <tr>
+        <th>LAB NAME</th>
+        <th>VALUE</th>
+        <th>UNITS</th>
+        <th>REFERENCE RANGE</th>
+      </tr>
+      <tr>
+        <td>Blood Test</td>
+        <td><input type="text" class="form-control m-2"></td>
+        <td><input type="text" class="form-control m-2"></td>
+        <td><input type="text" class="form-control m-2"></td>
+      </tr>
+      <tr>
+        <td>Urine Test</td>
+        <td><input type="text" class="form-control m-2"></td>
+        <td><input type="text" class="form-control m-2"></td>
+        <td><input type="text" class="form-control m-2"></td>
+      </tr>
+
+    </table>
+
+      
+  </section>
+<br><br>
+<div style="text-align: center;">
+  <button  id="generatebill" class="btn btn-info">Generate Report</button>
+</div>
+  
+
+    <br><br>
+
+    {% include "footer.html" %}
+  </main>
+
+
+<script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+
+<script>
+
+
+</script>
+

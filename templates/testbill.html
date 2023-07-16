@@ -5,6 +5,7 @@
 
 <head>
   <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <style>
     @page {
@@ -121,7 +122,6 @@
   <a href="{% url 'opd' %}" style=" font-size: 40px; cursor: pointer; text-decoration:none;">🏠</a>
   </div>
 
-
 <!--  <div>-->
 <!--    <img src="{% static 'logo/nobglogo.png' %}" width="400px" style="position:absolute; opacity:20%; left: 35%; top: 57%;">-->
 <!--  </div>-->
@@ -138,8 +138,8 @@
 
               <td>
 
-                <b>Patient ID : {{patient.id}}</b><br>
-                <b>Date : </b> {{patient.admission_date.date}}<br>
+<!--                <b>Patient ID : {{patient.id}}</b><br>-->
+<!--                <b>Admit Date : </b> {{patient.admission_date.date}}<br>-->
 
 
 
@@ -155,16 +155,15 @@
           <table>
             <tr style="text-transform: capitalize;">
               <td>
-                <b>Name :</b> {{patient.p_name}}<br>
-                <b>Mobile :</b> {{patient.mobile_number}}<br>
-                <b>Address :</b> {{patient.p_address}}<br>
-                <b>Gender :</b> {{patient.sex}}<br>
-                <b>Age :</b> {{patient.p_age}}<br>
+                <b>Patient ID : </b> {{pl.patient.id}}<br><br>
+                <b>Name :</b> {{pl.patient.p_name}}<br>
+                <b>Age|Sex :</b> {{pl.patient.sex}}<br>
+                <b>Referred by : </b> Dr. {{pl.patient.doctor.first_name}} {{pl.patient.doctor.last_name}}<br>
               </td>
 
               <td>
-                <b>Doctor Name :</b> Dr. {{patient.doctor.first_name}} {{patient.doctor.last_name}}<br>
-                <b>OPD fee :</b> {{patient.doctor.consultation_fee}}<br>
+                <b>Lab No. : </b>{{pl.id}}<br><br>
+                <b>Date : </b> {{pl.patient.admission_date.date}}<br>
 
 
               </td>
@@ -217,11 +216,67 @@
 
 
     </table>
+    <hr>
 
+
+      <table class="table"  style="border:2px solid black;">
+          <thead>
+            <tr>
+              <th scope="col" style="text-align : center;">S/N</th>
+              <th scope="col" style="text-align : center;">Services</th>
+              <th scope="col" style="text-align : center;">Item code</th>
+              <th scope="col" style="text-align : center;">Rate</th>
+              <th scope="col" style="text-align : center;">Quantity</th>
+              <th scope="col" style="text-align : center;">Amount</th>
+
+            </tr>
+          </thead>
+          <tbody>
+
+          {% for i in labs %}
+          <tr style="text-align : center;">
+              <th scope="row" style="text-align : center;">{{ forloop.counter }}</th>
+              <td style="text-align : center;">{{i.lab_name}}</td>
+              <td style="text-align : center;">{{i.id}}</td>
+              <td style="text-align : center;">{{i.lab_price}}</td>
+              <td style="text-align : center;">1</td>
+              <td style="text-align : center;">{{i.lab_price}}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+
+          <thead>
+              <tr style="text-align : center; border:1px solid black;">
+                  <th style="text-align : center;"></th>
+                  <th style="text-align : center;"></th>
+                  <th scope="row" style="text-align : center;">Total</th>
+                  <th style="text-align : center;"></th>
+                  <th style="text-align : center;"></th>
+                  <th scope="row" style="text-align : center;">{{tprice}}</th>
+                </tr>
+            </tbody>
+
+
+        </table>
+
+
+
+
+
+
+    <br>
   </div>
-<!--<div style="text-align:center; padding 10px; margin:15px;" >-->
-<!--  <button style="color : white; background-color: blue; padding: 10px; border:none; border-radius: 8px; box-shadow:1px 2px 10px black;" class="btn-info" onclick="print()" > PRINT </button>-->
-<!--</div>-->
+
+
+
+<script>
+
+
+
+
+
+</script>
+
 
 
 </body>

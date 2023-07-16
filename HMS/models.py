@@ -21,8 +21,6 @@ class Doctor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-
-
 class patient_table(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     oe = models.CharField(max_length=20, null=True, blank=True)
@@ -43,6 +41,17 @@ class patient_table(models.Model):
         import re
         if not re.match(r'^\d{10}$', self.mobile_number):
             raise ValidationError("Invalid mobile number format.")
+
+
+class LAB(models.Model):
+    lab_name = models.CharField(max_length=200, null=True, blank=True)
+    lab_price = models.CharField(max_length=50, null=True, blank=True)
+
+
+class Patient_LAB(models.Model):
+    patient = models.ForeignKey(patient_table, on_delete=models.CASCADE)
+    labs = models.JSONField(blank=True,null=True)
+    test_date = models.DateTimeField(auto_now_add=True)
 
 
 

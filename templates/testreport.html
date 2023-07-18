@@ -1,0 +1,221 @@
+{% load static %}
+{% load post_tags %}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+
+<head>
+  <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <style>
+    @page {
+      size: A4;
+      margin: 1cm;
+
+      @frame footer {
+        -pdf-frame-content: footerContent;
+        bottom: 0cm;
+        margin-left: 9cm;
+        margin-right: 9cm;
+        height: 1cm;
+      }
+    }
+
+    .invoice-box {
+      max-width: 595px;
+      height: 842px;
+      margin: auto;
+      padding: 30px;
+      border: 1px solid #eee;
+      box-shadow: 0 0 10px rgba(0, 0, 0, .15);
+      font-size: 16px;
+      line-height: 24px;
+      font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+      color: #555;
+    }
+
+    .invoice-box table {
+      width: 100%;
+      line-height: inherit;
+      text-align: left;
+    }
+
+    .invoice-box table td {
+      padding: 5px;
+      vertical-align: top;
+    }
+
+    .invoice-box table tr td:nth-child(2) {
+      text-align: right;
+    }
+
+    .invoice-box table tr.top table td {
+      padding-bottom: 20px;
+    }
+
+    .invoice-box table tr.top table td.title {
+      font-size: 45px;
+      line-height: 45px;
+      color: #333;
+    }
+
+    .invoice-box table tr.information table td {
+      padding-bottom: 40px;
+    }
+
+    .invoice-box table tr.heading td {
+      background: #eee;
+      border-bottom: 1px solid #ddd;
+      font-weight: bold;
+    }
+
+    .invoice-box table tr.details td {
+      padding-bottom: 20px;
+    }
+
+    .invoice-box table tr.item td {
+      border-bottom: 1px solid #eee;
+    }
+
+    .invoice-box table tr.item.last td {
+      border-bottom: none;
+    }
+
+    .invoice-box table tr.total td:nth-child(2) {
+      border-top: 2px solid #eee;
+      font-weight: bold;
+    }
+
+    @media only screen and (max-width: 600px) {
+      .invoice-box table tr.top table td {
+        width: 100%;
+        display: block;
+        text-align: center;
+      }
+
+      .invoice-box table tr.information table td {
+        width: 100%;
+        display: block;
+        text-align: center;
+      }
+    }
+
+    /** RTL **/
+    .rtl {
+      direction: rtl;
+      font-family: Tahoma, 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+    }
+
+    .rtl table {
+      text-align: right;
+    }
+
+    .rtl table tr td:nth-child(2) {
+      text-align: left;
+    }
+  </style>
+</head>
+
+<body>
+
+  <br>
+  <div style="text-align:center;">
+  <a href="{% url 'opd' %}" style=" font-size: 40px; cursor: pointer; text-decoration:none;">🏠</a>
+  </div>
+
+<!--  <div>-->
+<!--    <img src="{% static 'logo/nobglogo.png' %}" width="400px" style="position:absolute; opacity:20%; left: 35%; top: 57%;">-->
+<!--  </div>-->
+  <div class="invoice-box">
+
+    <div class="container mt-3">
+
+      <div class="head" style="display: flex;">
+        <img src="{% static 'logo/nobglogo.png' %}" width="100px" height="100px" style="position:relative; top:-20px;">
+
+        <h5 style="position:relative; top:13px; font-size:30px; text-wight:bold;"><b>{% hospital_name %}</b></h5>
+      </div>
+
+      <div class="row">
+
+        <div class="col-6 col-sm-6 col-md-6 col-lg-6">
+
+          <b>Patient ID : </b> {{pl.patient.id}}<br>
+          <b>Patient Name :</b> {{pl.patient.p_name}}<br>
+          <b>Ref by : </b> Dr. {{pl.patient.doctor.first_name}} {{pl.patient.doctor.last_name}}<br>
+          <b>Test Asked : </b> {{pl.patient.doctor.first_name}}<br>
+          
+
+        </div>
+
+        <div class="col-6 col-sm-6 col-md-6 col-lg-6" style="margin-left:0px;">
+          <b>Lab No. : </b>{{pl.id}}<br>
+          <b>Age|Sex :</b> {{pl.patient.sex}}<br>
+          <b>Sample coll at : </b> {{pl.patient.admission_date.date}}<br>
+          <b>Reporting date at : </b> {{pl.patient.admission_date.date}}
+
+        </div>
+
+
+      </div>
+
+      
+
+      <table class="table mt-2"  >
+        <thead style="color:white; background-color:rgb(3, 97, 109)">
+          <tr>
+            <th scope="col" style="text-align : center;">S/N</th>
+            <th scope="col" style="text-align : center;">Test Name</th>
+            <th scope="col" style="text-align : center;">Value</th>
+            <th scope="col" style="text-align : center;">Units</th>
+            <th scope="col" style="text-align : center;">Referance Range</th>
+
+          </tr>
+        </thead>
+        <tbody>
+
+         
+
+        
+          {% for i in tests %}
+        <tr style="text-align : center;">
+            <th scope="row" style="text-align : center;">{{ forloop.counter}}</th>
+            <td style="text-align : center;">{{i.lab_name}}</td>
+            <td style="text-align : center;">{{ forloop.counter0|lab_values:request }}</td>
+            <td style="text-align : center;">{{i.units}}</td>
+            <td style="text-align : center;">{{i.ref_range}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+
+       
+
+
+      </table>
+
+
+
+    </div>
+
+
+    
+    <br>
+  </div>
+
+
+
+<script>
+
+
+
+
+
+</script>
+
+
+
+</body>
+
+</html>

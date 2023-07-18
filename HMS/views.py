@@ -89,14 +89,21 @@ def opd(request):
         pid = patient_table.objects.all().order_by("-id")[0].id
         return redirect(f'opdbill/{pid}')
 
+    if request.user.is_authenticated:
+        doctor = Doctor.objects.all()
+        return render(request,"opd.html",{'doctors':doctor})
+    else:
+        return render(request,"login.html")
 
-    doctor = Doctor.objects.all()
-    return render(request,"opd.html",{'doctors':doctor})
 
 
 def opdbill(request,idd):
-    patient = patient_table.objects.get(id=idd)
-    return render(request,'opd_bill.html',{'patient':patient})
+    if request.user.is_authenticated:
+        patient = patient_table.objects.get(id=idd)
+        return render(request,'opd_bill.html',{'patient':patient})
+    else:
+        return render(request,"login.html")
+
 
 
 def patients(request):
@@ -115,9 +122,12 @@ def patients(request):
             p=patient_table.objects.filter(p_name__icontains=search)
         return render(request, 'patients.html', {'patients': p})
 
+    if request.user.is_authenticated:
+        patient = patient_table.objects.all().order_by("-id")
+        return render(request, 'patients.html',{'patients':patient})
+    else:
+        return render(request,"login.html")
 
-    patient = patient_table.objects.all().order_by("-id")
-    return render(request, 'patients.html',{'patients':patient})
 
 
 def doctors(request):
@@ -133,8 +143,13 @@ def doctors(request):
             d = Doctor.objects.filter(first_name__icontains = search)
 
         return render(request, 'doctors.html', {'doctors': d})
-    doctor = Doctor.objects.all().order_by("-id")
-    return render(request, 'doctors.html',{'doctors':doctor})
+
+    if request.user.is_authenticated:
+        doctor = Doctor.objects.all().order_by("-id")
+        return render(request, 'doctors.html',{'doctors':doctor})
+    else:
+        return render(request,"login.html")
+
 
 
 def lab(request):
@@ -147,8 +162,12 @@ def lab(request):
             message = "patient is not found!!! "
             return render(request, 'labs.html', {'message': message})
 
-    message = "Welcome to Lab 😍"
-    return render(request,'labs.html',{'message': message})
+    if request.user.is_authenticated:
+        message = "Welcome to Lab 😍"
+        return render(request,'labs.html',{'message': message})
+    else:
+        return render(request,"login.html")
+
 
 
 # API PART
@@ -192,14 +211,19 @@ def testBill(request):
         array.append(LAB.objects.get(id=i))
         t_price = t_price + int(LAB.objects.get(id=i).lab_price)
 
-    return render(request,"testbill.html",{'pl':p_lab,'labs':array,'tprice':t_price})
+    if request.user.is_authenticated:
+        return render(request,"testbill.html",{'pl':p_lab,'labs':array,'tprice':t_price})
+    else:
+        return render(request,"login.html")
+
+
 
 
 def labresult(request):
     if request.POST:
         lab_id = request.POST['search']
         print(lab_id)
-        
+
         try:
             pl = Patient_LAB.objects.get(id=int(lab_id))
             jsondata = pl.labs
@@ -208,14 +232,19 @@ def labresult(request):
             t_price = 0
             for i in data['labs']:
                 array.append(LAB.objects.get(id=i))
-                    
+
             al = len(array)
             return render(request, 'labresult.html',{'plab':pl,'ptests':array,'alen':al})
 
         except:
             message = "patient is not found!!! "
             return render(request, 'labresult.html', {'message': message})
-    return render(request,'labresult.html')
+
+    if request.user.is_authenticated:
+        return render(request,'labresult.html')
+    else:
+        return render(request,"login.html")
+
 
 
 
@@ -225,10 +254,10 @@ def update_patient_lab(request, pk):
         patient_lab = Patient_LAB.objects.get(id=pk)
     except Patient_LAB.DoesNotExist:
         return JsonResponse({'error': 'Invalid Patient LAB ID'}, status=400)
-    
+
     if request.method == 'POST':
         labs_data = request.POST.get('labs')
-        
+
         try:
             labs_data = json.loads(labs_data)
             labs = patient_lab.labs or {}
@@ -239,7 +268,7 @@ def update_patient_lab(request, pk):
             return JsonResponse({'success': 'Patient LAB updated successfully'}, status=200)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
-    
+
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
@@ -254,10 +283,15 @@ def testreportbill(request,pk):
     labval=[]
     for j in data['labvalue']:
         labval.append(j)
-    
+
     print(array,labval)
     tlen = len(array)
 
     dlen = range(0,tlen)
-    return render(request,'testreport.html',{"tests":array,"pl":pl,"labval":labval,'tlen':tlen,'loop_times':dlen})
+
+    if request.user.is_authenticated:
+        return render(request,'testreport.html',{"tests":array,"pl":pl,"labval":labval,'tlen':tlen,'loop_times':dlen})
+    else:
+        return render(request,"login.html")
+
 

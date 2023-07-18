@@ -4,6 +4,7 @@ from django.contrib.auth.models import User,auth
 from .models import Doctor,patient_table,LAB,Patient_LAB
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+import json
 
 
 
@@ -182,7 +183,6 @@ def patient_lab_api(request):
 
 
 def testBill(request):
-    import json
     p_lab = Patient_LAB.objects.all().order_by("-id")[0]
     jsondata = p_lab.labs
     data = json.loads(jsondata)
@@ -196,4 +196,68 @@ def testBill(request):
 
 
 def labresult(request):
+    if request.POST:
+        lab_id = request.POST['search']
+        print(lab_id)
+        
+        try:
+            pl = Patient_LAB.objects.get(id=int(lab_id))
+            jsondata = pl.labs
+            data = json.loads(jsondata)
+            array = []
+            t_price = 0
+            for i in data['labs']:
+                array.append(LAB.objects.get(id=i))
+                    
+            al = len(array)
+            return render(request, 'labresult.html',{'plab':pl,'ptests':array,'alen':al})
+
+        except:
+            message = "patient is not found!!! "
+            return render(request, 'labresult.html', {'message': message})
     return render(request,'labresult.html')
+
+
+
+@csrf_exempt
+def update_patient_lab(request, pk):
+    try:
+        patient_lab = Patient_LAB.objects.get(id=pk)
+    except Patient_LAB.DoesNotExist:
+        return JsonResponse({'error': 'Invalid Patient LAB ID'}, status=400)
+    
+    if request.method == 'POST':
+        labs_data = request.POST.get('labs')
+        
+        try:
+            labs_data = json.loads(labs_data)
+            labs = patient_lab.labs or {}
+            labs = json.loads(labs) if labs else {}  # Parse existing labs data if it exists
+            labs.update(labs_data)
+            patient_lab.labs = json.dumps(labs)  # Convert labs back to JSON string
+            patient_lab.save()
+            return JsonResponse({'success': 'Patient LAB updated successfully'}, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+def testreportbill(request,pk):
+    pl = Patient_LAB.objects.get(id=int(pk))
+    request.session['labid'] = int(pk)
+    jsondata = pl.labs
+    data = json.loads(jsondata)
+    array = []
+    for i in data['labs']:
+        array.append(LAB.objects.get(id=i))
+    labval=[]
+    for j in data['labvalue']:
+        labval.append(j)
+    
+    print(array,labval)
+    tlen = len(array)
+
+    dlen = range(0,tlen)
+    return render(request,'testreport.html',{"tests":array,"pl":pl,"labval":labval,'tlen':tlen,'loop_times':dlen})
+

@@ -1,4 +1,6 @@
 
+{% load static %}
+
 {% include "sidenav.html" %}
 <main>
     <!-- nav start -->
@@ -7,6 +9,7 @@
   <style>
     body{
       overflow-x : hidden;
+
     }
 
     #addbtn:hover{
@@ -39,11 +42,19 @@
       box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
     }
 
+   
+
 
   </style>
 
   <br><br><br><br>
+
+  <!-- <img src="{% static 'logo/nobglogo.png' %}" width="500px" style="position:absolute; opacity:10%; left: 25%; top: 10%;"> -->
+  
+
 <h1 style="text-align:center">Generate Lab Report</h1>
+
+
 
     <!-- content end-->
   <form method="post">
@@ -65,17 +76,17 @@
 
 
 
-  {% if patient %}
+  {% if plab %}
   <section>
-    <div class="row" style="margin : 10px ; padding :10px; background-color : gray; color:white; border:none; border-radius:8px;box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;">
+    <div class="row" style="margin : 10px ; padding :10px; background-color : rgba(0, 104, 169, 0.64); color:white; border:none; border-radius:8px;box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;">
       <div class="col-12 col-sm-12 col-md-6 col-lg-6">
-        <b>Patient ID : </b>{{patient.id}}<br>
-        <b>Name : </b>{{patient.p_name}}<br>
-        <b>Age|Sex : </b>{{patient.p_age}} | {{patient.sex}}<br>
+        <b>Lab ID : </b>{{plab.id}}<br>
+        <b>Name : </b>{{plab.patient.p_name}}<br>
+        <b>Age|Sex : </b>{{plab.patient.p_age}} | {{plab.patient.sex}}<br>
       </div>
       <div class="col-12 col-sm-12 col-md-6 col-lg-6">
-        <b>Admit Date : </b>{{patient.admission_date.date}}<br>
-        <b>Referred By : </b>Dr. {{patient.doctor.first_name}} {{patient.doctor.last_name}}<br>
+        <b>Admit Date : </b>{{plab.patient.admission_date.date}}<br>
+        <b>Referred By : </b>Dr. {{plab.patient.doctor.first_name}} {{plab.patient.doctor.last_name}}<br>
       </div>
     </div>
   </section>
@@ -90,46 +101,102 @@
   <br>
 
   <section>
-
+    {% if ptests %}
     <table style="text-align:center; margin-left:130px;">
-      <tr>
-        <th>LAB NAME</th>
+      <tr style="padding: 10px;">
+        <th>S/N</th>
+        <th style="width: 200px;">LAB NAME</th>
         <th>VALUE</th>
-        <th>UNITS</th>
-        <th>REFERENCE RANGE</th>
-      </tr>
-      <tr>
-        <td>Blood Test</td>
-        <td><input type="text" class="form-control m-2"></td>
-        <td><input type="text" class="form-control m-2"></td>
-        <td><input type="text" class="form-control m-2"></td>
-      </tr>
-      <tr>
-        <td>Urine Test</td>
-        <td><input type="text" class="form-control m-2"></td>
-        <td><input type="text" class="form-control m-2"></td>
-        <td><input type="text" class="form-control m-2"></td>
+        <th style="width: 140px;">UNITS</th>
+        <th >REFERENCE RANGE</th>
       </tr>
 
+      {% for test in ptests %}
+      <tr style="padding: 10px;">
+        <td>{{forloop.counter}}.</td>
+        <td>{{test.lab_name}}</td>
+        <td><input type="text" id="t{{forloop.counter}}" placeholder="{{test.lab_name}} value" class="form-control m-2"></td>
+        <td>{{test.units}}</td>
+        <td>{{test.ref_range}}</td>
+      </tr>
+      {% endfor %}
+      
     </table>
-
+    {% endif %}
       
   </section>
 <br><br>
 <div style="text-align: center;">
   <button  id="generatebill" class="btn btn-info">Generate Report</button>
 </div>
-  
+
 
     <br><br>
 
     {% include "footer.html" %}
   </main>
+  
 
 
 <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
 
 <script>
+
+    
+
+    $("#generatebill").click(function(){
+
+
+    var al = Number("{{alen}}")
+    var ar = []
+    for(i=1; i<=al; i++ ){
+
+        ind = "#t"+i.toString()
+        vlu = $(ind).val()
+        console.log(vlu)
+        ar.push(Number(vlu))
+    }
+    console.log(ar);
+
+    const labsData = {
+      "labvalue" : ar ,
+    };
+
+    console.log(labsData)
+
+  if(ar[0] != 0 && ar.length!=0){
+
+    var result = window.confirm("Are you sure the data you entered is correct!!");
+      if(result === true){
+
+          $.ajax({
+            url: '/labreport/'+'{{plab.id}}',
+            type: 'POST',
+            data: {
+              labs: JSON.stringify(labsData),
+            },
+            dataType: 'json',
+            success: function(response) {
+              console.log('Patient LAB updated successfully');
+              console.log(response);
+              window.location.href = "/testreport/"+"{{plab.id}}";
+            },
+            error: function(error) {
+              console.error('Error updating Patient LAB');
+              console.log(error.responseJSON);
+            }
+          });
+
+
+      }
+     
+  }
+  else{
+    alert("Please enter the  lab values")
+  }
+   
+});
+
 
 
 </script>

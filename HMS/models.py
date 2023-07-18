@@ -46,6 +46,8 @@ class patient_table(models.Model):
 class LAB(models.Model):
     lab_name = models.CharField(max_length=200, null=True, blank=True)
     lab_price = models.CharField(max_length=50, null=True, blank=True)
+    units = models.CharField(max_length=10, null=True, blank=True)
+    ref_range = models.CharField(max_length=20, null=True, blank=True)
 
 
 class Patient_LAB(models.Model):
@@ -56,6 +58,6 @@ class Patient_LAB(models.Model):
 
 class LAB_Report(models.Model):
     P_lab = models.ForeignKey(Patient_LAB, on_delete=models.CASCADE)
-    l_report = models.JSONField()
+    l_report_value = models.DecimalField(max_digits=6, decimal_places=2)
     date = models.DateTimeField(auto_now_add=True)
 

@@ -15,5 +15,7 @@ urlpatterns = [
     path('patient_lab',views.patient_lab_api, name="patientlab"),
     path('testbill',views.testBill, name="testbill"),
     path('labresult',views.labresult, name="labresult"),
+    path('labreport/<int:pk>',views.update_patient_lab, name="labreport"),
+    path('testreport/<int:pk>',views.testreportbill, name="testreport"),
 
 ]

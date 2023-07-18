@@ -111,6 +111,10 @@
     .rtl table tr td:nth-child(2) {
       text-align: left;
     }
+    .head{
+      text-align: center;
+    }
+
   </style>
 </head>
 
@@ -125,104 +129,37 @@
 <!--  <div>-->
 <!--    <img src="{% static 'logo/nobglogo.png' %}" width="400px" style="position:absolute; opacity:20%; left: 35%; top: 57%;">-->
 <!--  </div>-->
-  <div class="invoice-box">
-    <table cellpadding="0" cellspacing="0">
-      <tr class="top">
-        <td colspan="2">
-          <table>
-            <tr>
-              <td class="title"  style="display:flex;">
-                <img src="{% static 'logo/nobglogo.png' %}" width="100px" height="100px" style="position:relative; top:-20px;">
-                  <h5 style="position:relative; top:13px; font-size:30px; text-wight:bold;"><b>Kalyan Health Care Pvt. Ltd.</b></h5>
-              </td>
-
-              <td>
-
-                <b>Patient ID : {{patient.id}}</b><br>
-                <b>Date : </b> {{patient.admission_date.date}}<br>
+  <div class="invoice-box mb-5">
 
 
+    <div class="ro">
+      <div class="head" >
+        <img src="{% static 'logo/nobglogo.png' %}" width="100px"  >
+        <h5 style="position:relative; top:13px; font-size:30px; text-wight:bold;"><b>Kalyan Health Care Pvt. Ltd.</b></h5>
+        <h4 class="m-3"><b>{{patient.oe}}</b></h4>
+        <p style="text-align:right;"><b>Date : </b> {{patient.admission_date.date}}</p>
+      </div>
+      <hr>
+      
 
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-<h4 class="m-3"><b>{{patient.oe}}</b></h4>
-
-      <tr class="information">
-        <td colspan="2">
-          <table>
-            <tr style="text-transform: capitalize;">
-              <td>
-                <b>Name :</b> {{patient.p_name}}<br>
-                <b>Mobile :</b> {{patient.mobile_number}}<br>
-                <b>Address :</b> {{patient.p_address}}<br>
-                <b>Gender :</b> {{patient.sex}}<br>
-                <b>Age :</b> {{patient.p_age}}<br>
-              </td>
-
-              <td>
-                <b>Doctor Name :</b> Dr. {{patient.doctor.first_name}} {{patient.doctor.last_name}}<br>
-                <b>OPD fee :</b> {{patient.doctor.consultation_fee}}<br>
-
-
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-
-
-<!--      <tr class="information">-->
-<!--        <td colspan="2">-->
-<!--          <table>-->
-<!--            <tr>-->
-<!--              <td>-->
-<!--                Disease and Symptoms :<br>-->
-<!--                &nbsp &nbsp &nbsp &nbsp &nbsp {{symptoms}}-->
-<!--              </td>-->
-
-<!--            </tr>-->
-<!--          </table>-->
-<!--        </td>-->
-<!--      </tr>-->
-
-
-
-<!--      <tr class="information">-->
-<!--        <td colspan="2">-->
-<!--          <table>-->
-<!--            <tr>-->
-<!--              <td>-->
-<!--                <b>Charges</b><br><br>-->
-<!--                  Consulting Charge : {{patient.doctor.consultation_fee}}-->
-<!--&lt;!&ndash;                Room Charge of {{daySpent}} Days : {{roomCharge}}<br>&ndash;&gt;-->
-
-<!--&lt;!&ndash;                Doctor Fee : {{doctorFee}}<br>&ndash;&gt;-->
-<!--&lt;!&ndash;                Medicine Cost : {{medicineCost}}<br>&ndash;&gt;-->
-<!--&lt;!&ndash;                Other Charge : {{OtherCharge}} <br><br>&ndash;&gt;-->
-
-<!--              </td>-->
-
-<!--              <td>-->
-<!--                <br><br><br>-->
-<!--                <b>Total Rupees : {{patient.doctor.consultation_fee}}</b>-->
-<!--              </td>-->
-
-<!--            </tr>-->
-<!--          </table>-->
-<!--        </td>-->
-<!--      </tr>-->
-
-
-    </table>
-
+      <div class="row p-3">
+        <div class="col-6 col-sm-6 col-md-6 col-lg-6" style="text-transform: capitalize;">
+          <b>Patient ID : {{patient.id}}</b><br>
+          <b>Name :</b> {{patient.p_name}}<br>
+          <b>Address :</b> {{patient.p_address}}<br>
+          <b>Mobile :</b> {{patient.mobile_number}}<br>
+          <b>Doctor Name :</b> Dr. {{patient.doctor.first_name}} {{patient.doctor.last_name}}<br>
+          <b>{{patient.oe}} fee : {{patient.doctor.consultation_fee}}</b><br>
+        </div>
+        <div class="col-6 col-sm-6 col-md-6 col-lg-6 " style="text-align: left; padding-left : 228px;" >
+          <br>
+          <b>Age :</b> {{patient.p_age}} year <br>
+          <b>Sex :</b> {{patient.sex}}<br>
+          
+        </div>
+      </div>
+    </div>
   </div>
-<!--<div style="text-align:center; padding 10px; margin:15px;" >-->
-<!--  <button style="color : white; background-color: blue; padding: 10px; border:none; border-radius: 8px; box-shadow:1px 2px 10px black;" class="btn-info" onclick="print()" > PRINT </button>-->
-<!--</div>-->
-
 
 </body>
 

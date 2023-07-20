@@ -20,21 +20,24 @@ def signup(request):
             email = email.strip()
             pass1 = request.POST['password']
             pass2 = request.POST['repassword']
+            admincode = request.POST['admin-code']
+            if admincode == "2263262":
+                if pass1 == pass2:
+                    if User.objects.filter(username=uname).exists():
+                        messages.info(request, 'Username Taken')
 
-            if pass1 == pass2:
-                if User.objects.filter(username=uname).exists():
-                    messages.info(request, 'Username Taken')
+                    elif User.objects.filter(email=email).exists():
+                        messages.info(request, 'Email Already Taken')
 
-                elif User.objects.filter(email=email).exists():
-                    messages.info(request, 'Email Already Taken')
-
+                    else:
+                        user = User.objects.create_user(username=uname, password=pass1, email=email, first_name=fname,
+                                                        last_name=lname)
+                        user.save()
+                        return redirect('/')
                 else:
-                    user = User.objects.create_user(username=uname, password=pass1, email=email, first_name=fname,
-                                                    last_name=lname)
-                    user.save()
-                    return redirect('/')
+                    messages.info(request, 'both password are not save')
             else:
-                messages.info(request, 'both password are not save')
+                messages.info(request, 'Contact to Developer')
     except:
         messages.info(request, "something Else")
 

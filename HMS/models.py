@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from decimal import Decimal
 
 
 class Doctor(models.Model):
@@ -37,6 +38,10 @@ class patient_table(models.Model):
     admission_date = models.DateTimeField(auto_now_add=True)
     discharge_date = models.DateTimeField(auto_now=True)
 
+
+    def __str__(self):
+        return f"{self.p_name}"
+
     def clean(self):
         super().clean()
         self.validate_mobile_number()
@@ -52,28 +57,60 @@ class OtherCharges(models.Model):
     oc_name = models.CharField(max_length=200, null=True, blank=True)
     oc_price = models.CharField(max_length=50, null=True, blank=True)
 
+    def __str__(self):
+        return f"{self.oc_name}"
+
 
 class Patient_OtherCharges(models.Model):
     patient = models.ForeignKey(patient_table, on_delete=models.CASCADE)
     othercharge = models.ForeignKey(OtherCharges, on_delete=models.CASCADE)
-    billdata = models.DateTimeField(auto_now_add=True)
+    billdate = models.DateTimeField(auto_now_add=True)
+    quantity = models.PositiveIntegerField(default=1)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.patient.p_name} - {self.othercharge.oc_name}"
+
+
+    def save(self, *args, **kwargs):
+        if self.othercharge and self.quantity is not None:
+            self.total_price = Decimal(int(self.othercharge.oc_price)) * self.quantity
+        super(Patient_OtherCharges, self).save(*args, **kwargs)
 
 
 
-
-class LAB(models.Model):
+class LabCategory(models.Model):
     category = models.CharField(max_length=200, null=True, blank=True)
     sub_category = models.CharField(max_length=200, null=True, blank=True)
-    lab_name = models.CharField(max_length=200, null=True, blank=True)
     lab_price = models.CharField(max_length=50, null=True, blank=True)
+    def __str__(self):
+        return f"{self.sub_category}"
+
+class LAB(models.Model):
+    labcat = models.ForeignKey(LabCategory, on_delete=models.CASCADE)
+    lab_name = models.CharField(max_length=200, null=True, blank=True)
     units = models.CharField(max_length=10, null=True, blank=True)
     ref_range = models.CharField(max_length=20, null=True, blank=True)
+    def __str__(self):
+        return f"{self.labcat.category} - {self.labcat.sub_category} - {self.lab_name}"
+
 
 
 class Patient_LAB(models.Model):
     patient = models.ForeignKey(patient_table, on_delete=models.CASCADE)
-    labs = models.JSONField(blank=True,null=True)
-    test_date = models.DateTimeField(auto_now_add=True)
+    labCat = models.ForeignKey(LabCategory, on_delete=models.CASCADE)
+    testdate = models.DateTimeField(auto_now_add=True)
+    quantity = models.PositiveIntegerField(default=1)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.patient.p_name}-{self.labCat.sub_category}"
+
+    def save(self, *args, **kwargs):
+        if self.labCat and self.quantity is not None:
+            self.total_price = Decimal(int(self.labCat.lab_price)) * self.quantity
+        super(Patient_LAB, self).save(*args, **kwargs)
+
 
 
 class LAB_Report(models.Model):

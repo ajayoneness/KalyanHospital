@@ -1,21 +1,12 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.contrib.auth.models import User,auth
-from .models import Doctor,patient_table,LAB,Patient_LAB,OtherCharges,Patient_OtherCharges
+from .models import Doctor,patient_table,LAB,Patient_LAB,OtherCharges,Patient_OtherCharges,LabCategory
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.utils import timezone
-
-
-
-
-
-
-
-
-
-
+from decimal import Decimal
 
 
 
@@ -192,19 +183,13 @@ def lab(request):
 
 
 
+
+
+
 # API PART
 
-@csrf_exempt
-def lab_search_api(request):
-    if request.method == 'POST':
-        search_query = request.POST.get('search_query', '')
-        labs = LAB.objects.filter(lab_name__icontains=search_query).values('id','lab_name', 'lab_price')
-        results = list(labs)
-        return JsonResponse(results, safe=False)
-    return JsonResponse([], safe=False)
 
-
-
+#Other Charge Part Started
 @csrf_exempt
 def other_charges_api(request):
     if request.method == 'POST':
@@ -216,39 +201,159 @@ def other_charges_api(request):
 
 
 
+
+@csrf_exempt
+def create_patient_othercharges(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        patient_id = data.get('patientid')
+        othercharge_id = data.get('otherchargeId')
+        quantity = data.get('quantity', 1)  # Default quantity to 1 if not provided in the request data
+
+        try:
+            patient = patient_table.objects.get(pk=patient_id)
+            othercharge = OtherCharges.objects.get(pk=othercharge_id)
+        except (patient_table.DoesNotExist, OtherCharges.DoesNotExist):
+            return JsonResponse({'error': 'Invalid patientid or otherchargeId.'}, status=400)
+
+        try:
+            patient_other_charges = Patient_OtherCharges.objects.get(patient=patient, othercharge=othercharge)
+            # If the entry for the same patient and othercharge already exists, update the quantity
+            patient_other_charges.quantity = quantity
+            patient_other_charges.save()
+        except Patient_OtherCharges.DoesNotExist:
+            # If the entry does not exist, create a new one with the provided quantity
+            Patient_OtherCharges.objects.create(patient=patient, othercharge=othercharge, quantity=quantity)
+
+        return JsonResponse({'message': 'Patient_OtherCharges created/updated successfully.'}, status=201)
+
+    return JsonResponse({'error': 'This endpoint only accepts POST requests.'}, status=405)
+
+
+
 @csrf_exempt
 def patient_lab_api(request):
     if request.method == 'POST':
-        patient_id = request.POST.get('patient_id', None)
-        labs = request.POST.get('labs', None)
+        data = json.loads(request.body)
 
-        if patient_id is None or labs is None:
-            return JsonResponse({'error': 'Missing patient_id or labs'}, status=400)
+        # Extract data from the JSON object
+        patient_id = data.get('patient')
+        labCat_id = data.get('labCat')
+        quantity = data.get('quantity',1)
+
+
 
         try:
-            patient_lab = Patient_LAB(patient_id=patient_id, labs=labs)
+            patient = patient_table.objects.get(pk=patient_id)
+            labCat = LabCategory.objects.get(pk=labCat_id)
+        except (patient_table.DoesNotExist, LabCategory.DoesNotExist):
+            return JsonResponse({'error': 'Invalid patient or lab category ID.'}, status=400)
+
+        try:
+            patient_lab = Patient_LAB.objects.get(patient=patient, labCat=labCat)
+            # If the entry for the same patient and othercharge already exists, update the quantity
+            patient_lab.quantity = quantity
             patient_lab.save()
-            return JsonResponse({'success': 'Patient_LAB record created'}, status=201)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
+        except Patient_LAB.DoesNotExist:
+            # If the entry does not exist, create a new one with the provided quantity
+            Patient_LAB.objects.create(patient=patient, labCat=labCat, quantity=quantity)
+
+        return JsonResponse({'message': 'Patient_LAB created/updated successfully.'}, status=201)
+
+    return JsonResponse({'error': 'This endpoint only accepts POST requests.'}, status=405)
 
 
-def testBill(request):
-    p_lab = Patient_LAB.objects.all().order_by("-id")[0]
-    jsondata = p_lab.labs
-    data = json.loads(jsondata)
-    array = []
-    t_price = 0
-    for i in data['labs']:
-        array.append(LAB.objects.get(id=i))
-        t_price = t_price + int(LAB.objects.get(id=i).lab_price)
 
-    if request.user.is_authenticated:
-        return render(request,"testbill.html",{'pl':p_lab,'labs':array,'tprice':t_price})
-    else:
-        return render(request,"login.html")
+
+def otherchargesbill(request,idd):
+    p_data = patient_table.objects.get(id=int(idd))
+    current_date = timezone.now().date()
+    p_other_charges = Patient_OtherCharges.objects.filter(patient=p_data)
+
+    tc = 0
+    for i in p_other_charges:
+        tc += int(i.total_price)
+
+    context = {
+        "othercharge":p_other_charges,
+        'total_charge':float(tc)
+    }
+
+    return render(request,'chargesbill.html',context)
+
+
+
+
+# Lab Part Started
+@csrf_exempt
+def lab_search_api(request):
+    if request.method == 'POST':
+        search_query = request.POST.get('search_query', '')
+        labs = LabCategory.objects.filter(sub_category__icontains=search_query).values('id', 'sub_category', 'lab_price')
+        results = list(labs)
+        return JsonResponse(results, safe=False)
+    return JsonResponse([], safe=False)
+
+
+
+
+
+
+
+def testBill(request,idd):
+    p_data = patient_table.objects.get(id=int(idd))
+    current_date = timezone.now().date()
+    p_lab_data = Patient_LAB.objects.filter(patient=p_data)
+
+    tc = 0
+    for i in p_lab_data:
+        tc += int(i.total_price)
+
+    context = {
+        "labcharge":p_lab_data,
+        'total_charge':float(tc)
+    }
+    return render(request,'testbillNew.html',context)
+
+
+
+# @csrf_exempt
+# def patient_lab_api(request):
+#     if request.method == 'POST':
+#         patient_id = request.POST.get('patient_id', None)
+#         labs = request.POST.get('labs', None)
+#
+#         if patient_id is None or labs is None:
+#             return JsonResponse({'error': 'Missing patient_id or labs'}, status=400)
+#
+#         try:
+#             patient_lab = Patient_LAB(patient_id=patient_id, labs=labs)
+#             patient_lab.save()
+#             return JsonResponse({'success': 'Patient_LAB record created'}, status=201)
+#         except Exception as e:
+#             return JsonResponse({'error': str(e)}, status=500)
+#     else:
+#         return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+
+
+
+
+# def testBill(request):
+#     p_lab = Patient_LAB.objects.all().order_by("-id")[0]
+#     jsondata = p_lab.labs
+#     data = json.loads(jsondata)
+#     array = []
+#     t_price = 0
+#     for i in data['labs']:
+#         array.append(LAB.objects.get(id=i))
+#         t_price = t_price + int(LAB.objects.get(id=i).lab_price)
+#
+#     if request.user.is_authenticated:
+#         return render(request,"testbill.html",{'pl':p_lab,'labs':array,'tprice':t_price})
+#     else:
+#         return render(request,"login.html")
 
 
 
@@ -355,42 +460,6 @@ def otrhecharges(request):
 
 
 
-@csrf_exempt
-def create_patient_othercharges(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        patient_id = data.get('patientid')
-        othercharge_id = data.get('otherchargeId')
-
-        try:
-            patient = patient_table.objects.get(pk=patient_id)
-            othercharge = OtherCharges.objects.get(pk=othercharge_id)
-        except (patient_table.DoesNotExist, OtherCharges.DoesNotExist):
-            return JsonResponse({'error': 'Invalid patientid or otherchargeId.'}, status=400)
-
-
-        Patient_OtherCharges.objects.create(patient=patient, othercharge=othercharge)
-        return JsonResponse({'message': 'Patient_OtherCharges created successfully.'}, status=201)
-
-    return JsonResponse({'error': 'This endpoint only accepts POST requests.'}, status=405)
-
-
-
-
-def otherchargesbill(request,idd):
-    p_data = patient_table.objects.get(id=int(idd))
-    current_date = timezone.now().date()
-    p_other_charges = Patient_OtherCharges.objects.filter(patient=p_data, billdata__date=current_date)
-
-    tc = 0
-    for i in p_other_charges:
-        tc += int(i.othercharge.oc_price)
-
-    context = {
-        "othercharge":p_other_charges,
-        'total_charge':tc
-    }
-    return render(request,'chargesbill.html',context)
 
 
 

@@ -160,17 +160,17 @@
           <table>
             <tr style="text-transform: capitalize;">
               <td>
-                <b>Patient ID : </b> {{othercharge.0.patient.id}}<br><br>
-                <b>Name :</b> {{othercharge.0.patient.p_name}}<br>
-                <b>Age|Sex :</b> {{othercharge.0.patient.p_age}} |{{othercharge.0.patient.sex}}<br>
-                <b>Referred by : </b> Dr. {{othercharge.0.patient.doctor.first_name}} {{othercharge.0.patient.doctor.last_name}}<br>
+                <b>Patient ID : </b> {{labcharge.0.patient.id}}<br><br>
+                <b>Name :</b> {{labcharge.0.patient.p_name}}<br>
+                <b>Age|Sex :</b> {{labcharge.0.patient.p_age}} |{{labcharge.0.patient.sex}}<br>
+                <b>Referred by : </b> Dr. {{labcharge.0.patient.doctor.first_name}} {{labcharge.0.patient.doctor.last_name}}<br>
                 
               </td>
 
               <td>
-
-                <b>Admisson-Date : </b> {{othercharge.0.patient.admission_date.date}}<br>
-                <b>Present-Date : </b> {{othercharge.0.billdate.date}}<br>
+                <b>Lab ID : </b> {{labcharge.0.id}}<br><br>
+                <b>Admisson-Date : </b> {{labcharge.0.patient.admission_date.date}}<br>
+                <b>Present-Date : </b> {{labcharge.0.testdate.date}}<br>
                 <b>User Name : </b> {{user.username}}<br>
 
 
@@ -187,7 +187,7 @@
     </table>
     <hr>
 
-    <p class="text-center"><b>Other Charges</b></p>
+    <p class="text-center"><b>Lab/Test Bill</b></p>
       <table class="table"  style="border:5px solid rgb(0, 255, 204);">
           <thead style="background-color:rgb(0, 255, 204);">
             <tr>
@@ -202,13 +202,13 @@
           </thead>
           <tbody>
 
-          {% for i in othercharge %}
+          {% for i in labcharge %}
           <tr style="text-align : center;">
 
               <th scope="row" style="text-align : center;">{{ forloop.counter }}</th>
-              <td style="text-align : center;">{{i.othercharge.oc_name}}</td>
-              <td style="text-align : center;">{{i.othercharge.id}}</td>
-              <td style="text-align : center;">{{i.othercharge.oc_price}}</td>
+              <td style="text-align : center;">{{i.labCat.sub_category}}</td>
+              <td style="text-align : center;">{{i.labCat.id}}</td>
+              <td style="text-align : center;">{{i.labCat.lab_price}}</td>
               <td style="text-align : center;">{{i.quantity}}</td>
               <td style="text-align : center;">{{i.total_price}}</td>
             </tr>

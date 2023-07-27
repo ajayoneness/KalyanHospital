@@ -20,12 +20,12 @@
       padding: 0;
       margin: 0;
     }
-
+    
     .suggestion-item {
       padding: 10px;
       cursor: pointer;
     }
-
+    
     .suggestion-item:hover {
       background-color: lightgray;
     }
@@ -37,7 +37,7 @@
   </style>
 
   <br><br><br><br>
-<h1 style="text-align:center">Other Charges</h1>
+<h1 style="text-align:center">Lab/Test</h1>
 
     <!-- content end-->
   <form method="post">
@@ -48,7 +48,7 @@
 
       </div>
       <div class="col-12 col-sm-12 col-md-6 col-lg-6" style="display:flex; border:3px solid green; border-radius:25px; margin:0px; ">
-        <input type="text" id="patientidinput" name="search" class="form-control" placeholder="Enter Patient ID" style="background-color:white; border:none;" required>
+        <input type="text" name="search" class="form-control" placeholder="Enter Patient ID" style="background-color:white; border:none;" required>
         <input type="submit" value="🔍" style="background-color:white; border:none;">
       </div>
 
@@ -74,13 +74,11 @@
     </div>
   </section>
   {% else %}
-  {% if message %}
   <section>
     <div style="text-align:center; margin-top : 20px;">
       <b class="alert alert-danger" >{{message}}</b>
     </div>
   </section>
-  {% endif %}
 
   {% endif %}
   <br>
@@ -96,20 +94,12 @@
       <div class="col-12 col-md-12 col-sm-12 col-lg-6 mt-3" >
 
         <div style="display:flex;">
-          <input type="text" name="labsearch" placeholder="Enter Item Name" class="form-control" id="search-input">
+          <input type="text" name="labsearch" placeholder="Test search" class="form-control" id="search-input">
           <button id="add" style=" border:none; position:absolute; right:20px; top:3px; background-color:white; font-size:20px; font-weight:bold;">+</button>
-
-          <select id="quantity" class="form-control mb-3" style="width: 70px;" name="quantity">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-          </select>
-
-
-        </div>
+        </div>  
 
         <ul id="suggestions-list">
-
+          
         </ul>
 
       </div>
@@ -122,13 +112,13 @@
 
 
     </div>
-
+      
   </section>
 <br><br>
 <div style="text-align: center;">
   <button  id="generatebill" class="btn btn-info">Generate Bill</button>
 </div>
-
+  
 
     <br><br>
 
@@ -143,7 +133,7 @@
   var addbtn = $("#addbtn")
 
   $(document).ready(function(){
-
+    
     var p_id = "{{patient.id}}"
     var labData = {};
 
@@ -151,7 +141,7 @@
 
     $('#search-input').keyup(function() {
       var query = $(this).val();
-      var responseData="";
+      var responseData;
       if (query !== '') {
         $.ajax({
           url: '{% url "labsearch" %}', // Replace with your server-side script to fetch suggestions
@@ -166,83 +156,55 @@
 
           }
         });
-
+        
       } else {
         $('#suggestions-list').empty();
       }
-
     });
-
-
-
+    
     var s_id
     var t_name
     function showSuggestions(suggestions) {
       $('#suggestions-list').empty();
       $.each(suggestions, function(index, suggestion) {
-        var testdata = suggestion.id +". "+ suggestion.sub_category + ' ('+ suggestion.lab_price +')'
+        var testdata = suggestion.id +". "+ suggestion.lab_name + ' ('+ suggestion.lab_price +')'
         var listItem = $('<li class="suggestion-item"></li>').text(testdata);
-
         $('#suggestions-list').append(listItem);
       });
     }
-
+  
 
     $(document).on('click', '.suggestion-item', function() {
       var suggestion = $(this).text();
       $('#search-input').val(suggestion);
-
-      const numberPattern = /\d+/;
-      const matches = suggestion.match(numberPattern);
-      const number = matches ? parseInt(matches[0]) : null;
-      s_id = number
-
+      s_id = suggestion[0]
       t_name = suggestion
       $('#suggestions-list').empty();
     });
 
 
+
+    
+    
+
     var arr=[]
     $('#add').click(function() {
         var testt = $('#search-input').val()
         console.log(testt)
-
+        
         if (testt != ""  && testt[testt.length-1]==')'){
 
-           if(arr.includes(testt)==false)
-          {
-              var result = window.confirm("Are You conform To Add");
+          if(arr.includes(testt)==false)
+          {   
+              var result = window.confirm("Do you want to add testt on bill");
               if(result === true)
               {
-
-                  var data = {
-                    "patient": p_id,
-                    "labCat": s_id,
-                    "quantity": Number($("#quantity").val())
-                };
-
-                $.ajax({
-                    type: "POST",
-                    url: "{% url 'patientlab' %}",  
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    data: JSON.stringify(data),
-                    success: function(response) {
-                        console.log("Success:", response);
-                        // Handle success response here
-                    },
-                    error: function(error) {
-                        console.log("Error:", error.responseJSON);
-                        // Handle error response here
-                    }
-                });
-
-
+              
                 arr.push(Number(s_id))
                 //console.log(,Number(s_id))
                 var newItem = $('<li>'+testt+'</li>');
                 $('#test-list').append(newItem);
-
+              
               }
               else{
                 alert('Please enter valid test name');
@@ -255,33 +217,43 @@
         }
         else{
           alert('Please enter valid test name');
-        }
-
+        }  
+        
     });
 
 
     $("#generatebill").click(function(){
 
-
-      if (p_id){
-
+    
       var result = window.confirm("Are you sure to generate the bill");
       if(result === true){
 
-                //labData["labs"] = arr;
-                //console.log(labData)
-                window.location.href = "testbill/{{patient.id}}";
+                labData["labs"] = arr;
+                console.log(labData)
 
-
+        $.ajax({
+                  url: '{% url "patientlab" %}',
+                  method: 'POST',
+                  data: {
+                    patient_id: Number(p_id),
+                    labs: JSON.stringify(labData)
+                  },
+                  dataType: 'json',
+                  success: function(response) {
+                    console.log(response); 
+                    window.location.href = "{% url 'testbill' %}";
+                  },
+                  error: function(xhr, status, error) {
+                    console.log(error); 
+                  }
+                });
       }
-    }
-    else{
-      alert("Enter Patient Id...")
-    }
 
 
 
     });
+
+
 
 
 
@@ -290,6 +262,11 @@
 
 
   });
+
+
+
+
+
 
 
 </script>

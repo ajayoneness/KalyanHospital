@@ -48,7 +48,7 @@
 
       </div>
       <div class="col-12 col-sm-12 col-md-6 col-lg-6" style="display:flex; border:3px solid green; border-radius:25px; margin:0px; ">
-        <input type="text" name="search" class="form-control" placeholder="Enter Patient ID" style="background-color:white; border:none;" required>
+        <input type="text" id="patientidinput" name="search" class="form-control" placeholder="Enter Patient ID" style="background-color:white; border:none;" required>
         <input type="submit" value="🔍" style="background-color:white; border:none;">
       </div>
 
@@ -74,11 +74,13 @@
     </div>
   </section>
   {% else %}
+  {% if message %}
   <section>
     <div style="text-align:center; margin-top : 20px;">
       <b class="alert alert-danger" >{{message}}</b>
     </div>
   </section>
+  {% endif %}
 
   {% endif %}
   <br>
@@ -94,8 +96,28 @@
       <div class="col-12 col-md-12 col-sm-12 col-lg-6 mt-3" >
 
         <div style="display:flex;">
-          <input type="text" name="labsearch" placeholder="Test search" class="form-control" id="search-input">
+          <input type="text" name="labsearch" placeholder="Enter Item Name" class="form-control" id="search-input">
           <button id="add" style=" border:none; position:absolute; right:20px; top:3px; background-color:white; font-size:20px; font-weight:bold;">+</button>
+          
+          <select id="quantity" class="form-control mb-3" style="width: 70px;" name="quantity">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="14">14</option>
+            <option value="15">15</option>
+          </select>
+    
+          
         </div>  
 
         <ul id="suggestions-list">
@@ -206,7 +228,8 @@
               {
                 var data = {
                   "patientid": p_id,
-                  "otherchargeId": s_id
+                  "otherchargeId": s_id,
+                  "quantity": Number($("#quantity").val())
                   };
 
                   $.ajax({
@@ -250,6 +273,8 @@
 
     $("#generatebill").click(function(){
 
+
+      if (p_id){
     
       var result = window.confirm("Are you sure to generate the bill");
       if(result === true){
@@ -260,6 +285,10 @@
 
         
       }
+    }
+    else{
+      alert("Enter Patient Id...")
+    }
 
 
 

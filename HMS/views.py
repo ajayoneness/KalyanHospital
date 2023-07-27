@@ -11,16 +11,6 @@ from django.utils import timezone
 
 
 
-
-
-
-
-
-
-
-
-
-
 def signup(request):
     try:
         if request.method == "POST":
@@ -355,12 +345,14 @@ def otrhecharges(request):
 
 
 
+
 @csrf_exempt
 def create_patient_othercharges(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         patient_id = data.get('patientid')
         othercharge_id = data.get('otherchargeId')
+        quantity = data.get('quantity', 1)  # Default quantity to 1 if not provided in the request data
 
         try:
             patient = patient_table.objects.get(pk=patient_id)
@@ -368,12 +360,18 @@ def create_patient_othercharges(request):
         except (patient_table.DoesNotExist, OtherCharges.DoesNotExist):
             return JsonResponse({'error': 'Invalid patientid or otherchargeId.'}, status=400)
 
+        try:
+            patient_other_charges = Patient_OtherCharges.objects.get(patient=patient, othercharge=othercharge)
+            # If the entry for the same patient and othercharge already exists, update the quantity
+            patient_other_charges.quantity = quantity
+            patient_other_charges.save()
+        except Patient_OtherCharges.DoesNotExist:
+            # If the entry does not exist, create a new one with the provided quantity
+            Patient_OtherCharges.objects.create(patient=patient, othercharge=othercharge, quantity=quantity)
 
-        Patient_OtherCharges.objects.create(patient=patient, othercharge=othercharge)
-        return JsonResponse({'message': 'Patient_OtherCharges created successfully.'}, status=201)
+        return JsonResponse({'message': 'Patient_OtherCharges created/updated successfully.'}, status=201)
 
     return JsonResponse({'error': 'This endpoint only accepts POST requests.'}, status=405)
-
 
 
 
@@ -384,11 +382,11 @@ def otherchargesbill(request,idd):
 
     tc = 0
     for i in p_other_charges:
-        tc += int(i.othercharge.oc_price)
+        tc += int(i.total_price)
 
     context = {
         "othercharge":p_other_charges,
-        'total_charge':tc
+        'total_charge':float(tc)
     }
     return render(request,'chargesbill.html',context)
 

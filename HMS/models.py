@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from decimal import Decimal
 
 
 class Doctor(models.Model):
@@ -57,7 +58,13 @@ class Patient_OtherCharges(models.Model):
     patient = models.ForeignKey(patient_table, on_delete=models.CASCADE)
     othercharge = models.ForeignKey(OtherCharges, on_delete=models.CASCADE)
     billdata = models.DateTimeField(auto_now_add=True)
+    quantity = models.PositiveIntegerField(default=1)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        if self.othercharge and self.quantity is not None:
+            self.total_price = Decimal(int(self.othercharge.oc_price)) * self.quantity
+        super(Patient_OtherCharges, self).save(*args, **kwargs)
 
 
 

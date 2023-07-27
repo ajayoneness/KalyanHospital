@@ -24,7 +24,7 @@
     }
 
     .invoice-box {
-      max-width: 650px;
+      max-width: 95%;
       height: 842px;
       margin: auto;
       padding: 30px;
@@ -149,6 +149,7 @@
           <b>Patient Name :</b> {{pl.patient.p_name}}<br>
           <b>Ref by : </b> Dr. {{pl.patient.doctor.first_name}} {{pl.patient.doctor.last_name}}<br>
           <b>Test Asked : </b> {{pl.patient.doctor.first_name}}<br>
+          <b>User Name : </b>{{user.username}}<br>
           
 
         </div>
@@ -167,7 +168,7 @@
       
 
       <table class="table mt-2"  >
-        <thead style="color:white; background-color:rgb(3, 97, 109)">
+        <thead style="color:black; background-color:rgb(3, 97, 109)">
           <tr>
             <th scope="col" style="text-align : center;">S/N</th>
             <th scope="col" style="text-align : center;">Test Name</th>

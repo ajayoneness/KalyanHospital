@@ -21,7 +21,7 @@
     }
 
     .invoice-box {
-      max-width: 800px;
+      max-width: 95%;
       margin: auto;
       padding: 30px;
       border: 1px solid #eee;
@@ -149,16 +149,23 @@
           <b>Address :</b> {{patient.p_address}}<br>
           <b>Mobile :</b> {{patient.mobile_number}}<br>
           <b>Doctor Name :</b> Dr. {{patient.doctor.first_name}} {{patient.doctor.last_name}}<br>
+          <b>User Name :</b> {{user.username}} <br>
           <b>{{patient.oe}} fee : {{patient.doctor.consultation_fee}}</b><br>
         </div>
-        <div class="col-6 col-sm-6 col-md-6 col-lg-6 " style="text-align: left; padding-left : 228px;" >
+        <div class="col-6 col-sm-6 col-md-6 col-lg-6 " style="text-align: right;" >
           <br>
+
           <b>Age :</b> {{patient.p_age}} year <br>
           <b>Sex :</b> {{patient.sex}}<br>
           
         </div>
       </div>
     </div>
+
+
+
+
+
   </div>
 
 </body>

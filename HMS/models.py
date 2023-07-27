@@ -21,6 +21,10 @@ class Doctor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+
+
+
+
 class patient_table(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     oe = models.CharField(max_length=20, null=True, blank=True)
@@ -43,7 +47,23 @@ class patient_table(models.Model):
             raise ValidationError("Invalid mobile number format.")
 
 
+
+class OtherCharges(models.Model):
+    oc_name = models.CharField(max_length=200, null=True, blank=True)
+    oc_price = models.CharField(max_length=50, null=True, blank=True)
+
+
+class Patient_OtherCharges(models.Model):
+    patient = models.ForeignKey(patient_table, on_delete=models.CASCADE)
+    othercharge = models.ForeignKey(OtherCharges, on_delete=models.CASCADE)
+    billdata = models.DateTimeField(auto_now_add=True)
+
+
+
+
 class LAB(models.Model):
+    category = models.CharField(max_length=200, null=True, blank=True)
+    sub_category = models.CharField(max_length=200, null=True, blank=True)
     lab_name = models.CharField(max_length=200, null=True, blank=True)
     lab_price = models.CharField(max_length=50, null=True, blank=True)
     units = models.CharField(max_length=10, null=True, blank=True)

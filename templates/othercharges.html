@@ -1,0 +1,278 @@
+
+{% include "sidenav.html" %}
+<main>
+    <!-- nav start -->
+  {% include "navbar.html" %}
+
+  <style>
+    body{
+      overflow-x : hidden;
+    }
+
+    #addbtn:hover{
+      background-color : gray;
+      color : white;
+    }
+
+
+    #suggestions-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .suggestion-item {
+      padding: 10px;
+      cursor: pointer;
+    }
+    
+    .suggestion-item:hover {
+      background-color: lightgray;
+    }
+    #search-input{
+      box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
+    }
+
+
+  </style>
+
+  <br><br><br><br>
+<h1 style="text-align:center">Other Charges</h1>
+
+    <!-- content end-->
+  <form method="post">
+    {% csrf_token %}
+    <div class="row">
+
+      <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+
+      </div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6" style="display:flex; border:3px solid green; border-radius:25px; margin:0px; ">
+        <input type="text" name="search" class="form-control" placeholder="Enter Patient ID" style="background-color:white; border:none;" required>
+        <input type="submit" value="🔍" style="background-color:white; border:none;">
+      </div>
+
+    </div>
+
+    <br>
+  </form>
+
+
+
+  {% if patient %}
+  <section>
+    <div class="row" style="margin : 10px ; padding :10px; background-color : gray; color:white; border:none; border-radius:8px;box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;">
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+        <b>Patient ID : </b>{{patient.id}}<br>
+        <b>Name : </b>{{patient.p_name}}<br>
+        <b>Age|Sex : </b>{{patient.p_age}} | {{patient.sex}}<br>
+      </div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+        <b>Admit Date : </b>{{patient.admission_date.date}}<br>
+        <b>Referred By : </b>Dr. {{patient.doctor.first_name}} {{patient.doctor.last_name}}<br>
+      </div>
+    </div>
+  </section>
+  {% else %}
+  <section>
+    <div style="text-align:center; margin-top : 20px;">
+      <b class="alert alert-danger" >{{message}}</b>
+    </div>
+  </section>
+
+  {% endif %}
+  <br>
+
+  <section>
+
+
+
+
+    <div class="row mb-5 ml-5 mr-5">
+
+
+      <div class="col-12 col-md-12 col-sm-12 col-lg-6 mt-3" >
+
+        <div style="display:flex;">
+          <input type="text" name="labsearch" placeholder="Test search" class="form-control" id="search-input">
+          <button id="add" style=" border:none; position:absolute; right:20px; top:3px; background-color:white; font-size:20px; font-weight:bold;">+</button>
+        </div>  
+
+        <ul id="suggestions-list">
+          
+        </ul>
+
+      </div>
+
+      <div class="col-12 col-md-12 col-sm-12 col-lg-6 p-3 " >
+
+        <ul id="test-list" style="list-style: none; font-weight:bold;"></ul>
+
+      </div>
+
+
+    </div>
+      
+  </section>
+<br><br>
+<div style="text-align: center;">
+  <button  id="generatebill" class="btn btn-info">Generate Bill</button>
+</div>
+  
+
+    <br><br>
+
+    {% include "footer.html" %}
+  </main>
+
+
+<script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+
+<script>
+
+  var addbtn = $("#addbtn")
+
+  $(document).ready(function(){
+    
+    var p_id = "{{patient.id}}"
+    var labData = {};
+
+
+
+    $('#search-input').keyup(function() {
+      var query = $(this).val();
+      var responseData="";
+      if (query !== '') {
+        $.ajax({
+          url: '{% url "otherchargesearch" %}', // Replace with your server-side script to fetch suggestions
+          method: 'POST',
+          data: { search_query: query },
+          dataType: 'json',
+          async: false,
+          success: function(response) {
+            responseData=response
+            showSuggestions(response);
+            console.log(responseData)
+
+          }
+        });
+        
+      } else {
+        $('#suggestions-list').empty();
+      }
+
+    });
+
+    
+    
+    var s_id
+    var t_name
+    function showSuggestions(suggestions) {
+      $('#suggestions-list').empty();
+      $.each(suggestions, function(index, suggestion) {
+        var testdata = suggestion.id +". "+ suggestion.oc_name + ' ('+ suggestion.oc_price +')'
+        var listItem = $('<li class="suggestion-item"></li>').text(testdata);
+
+        $('#suggestions-list').append(listItem);
+      });
+    }
+  
+
+    $(document).on('click', '.suggestion-item', function() {
+      var suggestion = $(this).text();
+      $('#search-input').val(suggestion);
+
+      const numberPattern = /\d+/; 
+      const matches = suggestion.match(numberPattern);
+      const number = matches ? parseInt(matches[0]) : null;
+      s_id = number
+
+      t_name = suggestion
+      $('#suggestions-list').empty();
+    });
+
+
+    var arr=[]
+    $('#add').click(function() {
+        var testt = $('#search-input').val()
+        console.log(testt)
+
+        if (testt != ""  && testt[testt.length-1]==')'){
+
+           if(arr.includes(testt)==false)
+          {   
+              var result = window.confirm("Are You conform To Add");
+              if(result === true)
+              {
+                var data = {
+                  "patientid": p_id,
+                  "otherchargeId": s_id
+                  };
+
+                  $.ajax({
+                      type: "POST",
+                      url: "{% url 'saveothercharges' %}",  // Replace with your API endpoint URL
+                      contentType: "application/json; charset=utf-8",
+                      dataType: "json",
+                      data: JSON.stringify(data),
+                      success: function(response) {
+                          console.log("Success:", response);
+                          // Handle success response here
+                      },
+                      error: function(error) {
+                          console.log("Error:", error.responseJSON);
+                          // Handle error response here
+                      }
+                  });
+
+              
+                arr.push(Number(s_id))
+                //console.log(,Number(s_id))
+                var newItem = $('<li>'+testt+'</li>');
+                $('#test-list').append(newItem);
+              
+              }
+              else{
+                alert('Please enter valid test name');
+              }
+          }
+          else{
+            alert('alerady in the list');
+          } 
+
+        }
+        else{
+          alert('Please enter valid test name');
+        }  
+        
+    });
+
+
+    $("#generatebill").click(function(){
+
+    
+      var result = window.confirm("Are you sure to generate the bill");
+      if(result === true){
+
+                //labData["labs"] = arr;
+                //console.log(labData)
+                window.location.href = "otherchargesbill/{{patient.id}}";
+
+        
+      }
+
+
+
+    });
+
+
+
+
+
+
+
+  });
+
+
+</script>
+

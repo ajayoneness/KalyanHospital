@@ -1,10 +1,22 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.contrib.auth.models import User,auth
-from .models import Doctor,patient_table,LAB,Patient_LAB
+from .models import Doctor,patient_table,LAB,Patient_LAB,OtherCharges,Patient_OtherCharges
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.utils import timezone
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -133,6 +145,13 @@ def patients(request):
 
 
 
+
+# def patientDetails(request,pid):
+#     patient = patient_table.object.filter(id=pid)
+#     return render(request,'patientDetails.html',patient)
+
+
+
 def doctors(request):
     if request.method == "POST":
         search = request.POST['search']
@@ -183,6 +202,18 @@ def lab_search_api(request):
         results = list(labs)
         return JsonResponse(results, safe=False)
     return JsonResponse([], safe=False)
+
+
+
+@csrf_exempt
+def other_charges_api(request):
+    if request.method == 'POST':
+        search_query = request.POST.get('search_query', '')
+        oc = OtherCharges.objects.filter(oc_name__icontains=search_query).values('id','oc_name', 'oc_price')
+        results = list(oc)
+        return JsonResponse(results, safe=False)
+    return JsonResponse([], safe=False)
+
 
 
 @csrf_exempt
@@ -296,5 +327,71 @@ def testreportbill(request,pk):
         return render(request,'testreport.html',{"tests":array,"pl":pl,"labval":labval,'tlen':tlen,'loop_times':dlen})
     else:
         return render(request,"login.html")
+
+
+
+def otrhecharges(request):
+    if request.POST:
+        search = request.POST['search']
+        try:
+            pp = patient_table.objects.get(id=int(search))
+            context = {
+                'patient': pp
+            }
+            return render(request, 'othercharges.html',context)
+
+        except:
+            message = "patient is not found!!! "
+            return render(request, 'othercharges.html', {'message': message})
+
+
+    if request.user.is_authenticated:
+        message = ""
+        return render(request, 'othercharges.html', {'message': message})
+
+    else:
+        return render(request, "login.html")
+
+
+
+
+@csrf_exempt
+def create_patient_othercharges(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        patient_id = data.get('patientid')
+        othercharge_id = data.get('otherchargeId')
+
+        try:
+            patient = patient_table.objects.get(pk=patient_id)
+            othercharge = OtherCharges.objects.get(pk=othercharge_id)
+        except (patient_table.DoesNotExist, OtherCharges.DoesNotExist):
+            return JsonResponse({'error': 'Invalid patientid or otherchargeId.'}, status=400)
+
+
+        Patient_OtherCharges.objects.create(patient=patient, othercharge=othercharge)
+        return JsonResponse({'message': 'Patient_OtherCharges created successfully.'}, status=201)
+
+    return JsonResponse({'error': 'This endpoint only accepts POST requests.'}, status=405)
+
+
+
+
+def otherchargesbill(request,idd):
+    p_data = patient_table.objects.get(id=int(idd))
+    current_date = timezone.now().date()
+    p_other_charges = Patient_OtherCharges.objects.filter(patient=p_data, billdata__date=current_date)
+
+    tc = 0
+    for i in p_other_charges:
+        tc += int(i.othercharge.oc_price)
+
+    context = {
+        "othercharge":p_other_charges,
+        'total_charge':tc
+    }
+    return render(request,'chargesbill.html',context)
+
+
 
 
